@@ -2,6 +2,7 @@ var gulp        = require('gulp');
 var _           = require('lodash');
 //transformations
 var sass        = require('gulp-sass');
+var minifyCss   = require('gulp-minify-css');
 var uglify      = require('gulp-uglify');
 //tools
 var browserify  = require('browserify');
@@ -11,8 +12,12 @@ var buffer      = require('vinyl-buffer');
 var sourcemaps  = require('gulp-sourcemaps'); //other tools
 var concat      = require('gulp-concat');
 var gutil       = require('gulp-util');
-
 var browserSync = require('browser-sync');
+//environmental management
+var args        = require('yargs').argv;
+var gulpif      = require('gulp-if');
+
+var isProduction = args.env === "p" || args.env === "production";
 
 /*
 === CONFIGS ===
@@ -23,7 +28,8 @@ var mainFileName = tsFileBase + 'DemoProps.tsx';
 var tsFilePath = tsFileBase + '**/*.ts';
 var tsxFilePath = tsFileBase + '**/*.tsx';
 var scssFilePath = 'src/scss/**/*.scss';
-var outputDirectory = 'out';
+var staticFileBase = 'src/static/';
+var outputDirectory = isProduction? 'release' : 'out';
 var jsOutputPath = outputDirectory + '/js';
 var jsOutFileName = 'output.js';
 var cssOutputPath = outputDirectory + '/css';
@@ -61,7 +67,7 @@ gulp.task('watchAndBuild', function() {
       .pipe(source(jsOutFileName))
       .pipe(buffer())
       .pipe(sourcemaps.init({loadMaps: true}))
-        .pipe(uglify())
+        .pipe(gulpif(isProduction, uglify())) //only uglify in production
       .pipe(sourcemaps.write('./'))
       .pipe(gulp.dest(jsOutputPath))
       .pipe(browserSync.reload({stream: true}));
@@ -76,10 +82,17 @@ gulp.task('sass', function () {
     // .expect(scssFilePath)
     .pipe(sourcemaps.init())
         .pipe(sass({includePaths: ['.']}))
-    .pipe(sourcemaps.write())
+        .pipe(gulpif(isProduction, minifyCss())) //only minify css in production
     .pipe(concat('style.css'))
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(cssOutputPath))
     .pipe(browserSync.reload({stream:true}));
+});
+
+//copy files from html folder
+gulp.task('copyStatic', function() {
+  return gulp.src(staticFileBase + "*")
+    .pipe(gulp.dest(outputDirectory));
 });
 
 // The browser-sync task will run a local server
@@ -95,7 +108,7 @@ gulp.task('browser-sync', function() {
 });
 
 // Default task to be run with `gulp`
-gulp.task('default', ['watchAndBuild', 'sass', 'browser-sync'], function () {
+gulp.task('default', ['copyStatic', 'watchAndBuild', 'sass', 'browser-sync'], function () {
    //watch sass files and compile when any of them changes
   gulp.watch(scssFilePath, ['sass']);
 });

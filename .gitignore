@@ -1,6 +1,7 @@
 #
 typings
 out
+release
 src/ts/**/*.js
 
 # Logs

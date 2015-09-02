@@ -9,6 +9,8 @@ This template uses browserify to package all your javascript outupts into one fi
 - SASS/SCSS compilation
 - Watch your files and only recompile what's needed when you change a file
 - Emits a single javascript output using browserify
+- Generate source maps for both Typescript and SCSS
+- Uglify Javascript / minify CSS when you run in production mode `gulp --env production`
 
 # Install steps
 
@@ -26,3 +28,5 @@ You can run `gulp [task]` to run a specific task. Where `[task]` is the name of 
 The default actions will setup watchers for both Typescript files and Sass files. When these files change, `gulp` will recompile them and produce a new output.
 
 With our `browser-sync` too, your browser should refresh when the file has changed.
+
+For production releases, run `gulp --env production`
