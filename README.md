@@ -1,5 +1,5 @@
 # Frontend Typescript Gulp Example
-A project template for getting started with typescript (JSX support) and SASS, with auto recompilation!
+A project template for getting started with typescript (JSX support) and SASS, with auto recompilation and browser refresh!
 
 # Features
 - Typescript (JS/JSX) compilation
