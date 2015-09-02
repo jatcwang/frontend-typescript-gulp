@@ -1,5 +1,6 @@
 /// <reference path="../../typings/react/react.d.ts" />
 import React = require('react');
+import Helper = require('./Helper');
 
 class DemoProps {
   public name:string;
@@ -19,3 +20,10 @@ class Demo extends React.Component<DemoProps, any> {
     );
   }
 }
+
+class Blah {
+  public name: string;
+  public bing: number;
+}
+
+Helper.hi();

@@ -4,17 +4,24 @@
   "description": "testing typescript",
   "main": "gulpfile.js",
   "dependencies": {
-    "react": "^0.13.3",
-    "typescript": "^1.7.0-dev.20150831"
+    "lodash": "^3.10.1",
+    "react": "^0.13.3"
   },
   "devDependencies": {
     "browser-sync": "^2.8.2",
+    "browserify": "^11.0.1",
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
     "gulp-expect-file": "0.0.7",
     "gulp-sass": "^2.0.4",
     "gulp-sourcemaps": "^1.5.2",
-    "gulp-typescript": "^2.8.1"
+    "gulp-uglify": "^1.4.0",
+    "gulp-util": "^3.0.6",
+    "tsify": "^0.11.11",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.4.0",
+    "typescript": "^1.7.0-dev.20150831"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

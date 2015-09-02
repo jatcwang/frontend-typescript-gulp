@@ -1,42 +1,76 @@
 var gulp        = require('gulp');
-var browserSync = require('browser-sync');
-var reload      = browserSync.reload;
+var _           = require('lodash');
+//transformations
 var sass        = require('gulp-sass');
-var sourcemaps  = require('gulp-sourcemaps');
-var ts          = require('gulp-typescript');
+var uglify      = require('gulp-uglify');
+//tools
+var browserify  = require('browserify');
+var watchify    = require('watchify');
+var source      = require('vinyl-source-stream');
+var buffer      = require('vinyl-buffer');
+var sourcemaps  = require('gulp-sourcemaps'); //other tools
 var concat      = require('gulp-concat');
-// var expect = require('gulp-expect-file');
+var gutil       = require('gulp-util');
 
-var tsFilePath = 'src/ts/**/*.ts';
-var tsxFilePath = 'src/ts/**/*.tsx';
+var browserSync = require('browser-sync');
+
+/*
+=== CONFIGS ===
+*/
+
+var tsFileBase = 'src/ts/';
+var mainFileName = tsFileBase + 'DemoProps.tsx';
+var tsFilePath = tsFileBase + '**/*.ts';
+var tsxFilePath = tsFileBase + '**/*.tsx';
 var scssFilePath = 'src/scss/**/*.scss';
 var outputDirectory = 'out';
 var jsOutputPath = outputDirectory + '/js';
 var jsOutFileName = 'output.js';
 var cssOutputPath = outputDirectory + '/css';
 
-var tsProject = ts.createProject('tsconfig.json', {
-  module: 'amd',
-  target: 'ES5',
-  jsx: 'react',
-  typescript: require('typescript'), //use our own version of typescript
-  // out: jsOutFileName,
-})
+//typescript compiler options
+var tsOpts = {
+  noImplicitAny: true,
+  typescript: require('typescript') //use our own version of typescript compiler
+}
 
-gulp.task('typescript', function() {
-  console.log('Compiling Typescript');
-  var jsOutput = gulp.src([tsFilePath,tsxFilePath])
-    // .pipe(expect(tsFilePath))
-    .pipe(sourcemaps.init())
-    .pipe(ts(tsProject))
-    .js; //get the js output, not the definition file
-  return jsOutput
-    .pipe(concat(jsOutFileName))
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest(jsOutputPath))
-    .pipe(reload({stream: true}));
+//Use watchify's default options for browserify, as well as setting some of our own
+var browserifyOpts = _.assign({}, watchify.args, {
+  entries: [mainFileName],
+  debug: true
 });
 
+/*
+=== DEFINE OUR GULP TASKS ===
+*/
+
+gulp.task('watchAndBuild', function() {
+  //setup the watchify/browserify object
+  var b = watchify(browserify(browserifyOpts))
+    .plugin('tsify', tsOpts); // and add the typescript plugin for TS compilation
+
+  //setup what browserify will do for various events
+  b.on('update', bundle);
+  b.on('log', gutil.log);
+
+  //define the rebundling function
+  function bundle() {
+    return b
+      .bundle()
+      .on('error', function(error) {console.error(error.toString())})
+      .pipe(source(jsOutFileName))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({loadMaps: true}))
+        .pipe(uglify())
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest(jsOutputPath))
+      .pipe(browserSync.reload({stream: true}));
+  }
+
+  return bundle();
+})
+
+//The SASS compilation task
 gulp.task('sass', function () {
   return gulp.src(scssFilePath)
     // .expect(scssFilePath)
@@ -45,9 +79,11 @@ gulp.task('sass', function () {
     .pipe(sourcemaps.write())
     .pipe(concat('style.css'))
     .pipe(gulp.dest(cssOutputPath))
-    .pipe(reload({stream:true}));
+    .pipe(browserSync.reload({stream:true}));
 });
 
+// The browser-sync task will run a local server
+// when a reload event is called, it will reload the browser page
 gulp.task('browser-sync', function() {
   browserSync({
     server: {
@@ -59,8 +95,7 @@ gulp.task('browser-sync', function() {
 });
 
 // Default task to be run with `gulp`
-gulp.task('default', ['typescript', 'sass', 'browser-sync'], function () {
-   //watch ts/scss files and compile when any of them changes
-  gulp.watch([tsFilePath, tsxFilePath], ['typescript']);
+gulp.task('default', ['watchAndBuild', 'sass', 'browser-sync'], function () {
+   //watch sass files and compile when any of them changes
   gulp.watch(scssFilePath, ['sass']);
 });
