@@ -1,32 +1,25 @@
-# typescript-jsx-scss-gulp
-A project template for getting started with typescript + jsx (with sass compilation too) using Gulp.
+# Frontend Typescript Gulp Example
+A project template for getting started with typescript (JSX support) and SASS, with auto recompilation!
 
-This template uses browserify to package all your javascript outupts into one file
-
-# What's included
-
-- Typescript (js / jsx) compilation
+# Features
+- Typescript (JS/JSX) compilation
 - SASS/SCSS compilation
-- Watch your files and only recompile what's needed when you change a file
-- Emits a single javascript output using browserify
-- Generate source maps for both Typescript and SCSS
-- Uglify Javascript / minify CSS when you run in production mode `gulp --env production`
+- Single Javascript output using browserify
+- Source maps for both Typescript and SCSS
+- Auto recompilation and browser refresh when you change your files!
+- Uglify Javascript / minify CSS when you run in production mode (`gulp --env production`)
 
 # Install steps
-
-Make sure you have `gulp`, `tsd` installed globally. e.g. `npm install -g gulp`
-
+Make sure you have `gulp`, `tsd` installed globally. e.g. `npm install -g gulp tsd`
 1. `npm install` will install the dependencies of the project
 2. `tsd install` will add the Typescript definition files
 
 # Running
 
-Run `gulp` in the command line.
+For debug mode, run `gulp` in the command line. After compilation is complete, you can visit localhost:3000 to see the static html page with your compiled style and result.
 
 You can run `gulp [task]` to run a specific task. Where `[task]` is the name of the task (Use `gulp --tasks` to see the available tasks)
 
-The default actions will setup watchers for both Typescript files and Sass files. When these files change, `gulp` will recompile them and produce a new output.
-
-With our `browser-sync` too, your browser should refresh when the file has changed.
+With our use `browser-sync`, your browser should refresh when the file has changed.
 
 For production releases, run `gulp --env production`
